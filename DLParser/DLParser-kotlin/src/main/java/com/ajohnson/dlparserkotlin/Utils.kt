@@ -1,5 +1,7 @@
 package com.ajohnson.dlparserkotlin
 
+import kotlin.math.round
+
 /**
  * Utility functions used through out the framework.
  */
@@ -10,4 +12,6 @@ object Utils {
         val match = regex.matchEntire(data)?.value
         return match?.trim()
     }
+    
+    fun inchesFromCentimeters(centimeters: Double): Double = round(0.393701* centimeters)
 }
