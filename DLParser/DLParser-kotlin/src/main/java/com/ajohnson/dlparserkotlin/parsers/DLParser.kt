@@ -175,7 +175,8 @@ open class DLParser(val data: String) {
     }
 
     open fun parseBoolean(key: FieldKey): Boolean? {
-        return null  // TODO
+        val rawValue = parseString(key) ?: return null
+        return rawValue == "1"
     }
 
     open val parsedFirstName get() =
