@@ -3,11 +3,11 @@ package com.ajohnson.dlparserkotlin.parsers
 import com.ajohnson.dlparserkotlin.models.FieldKey
 
 /**
- * Created by ajohnson on 4/7/18.
+ * Published 2016.
  */
-class VersionNineParser: DLParser {
+internal class VersionNineParser(data: String): DLParser(data) {
 
-    constructor(data: String): super(data) {
+    init {
         fields.remove(FieldKey.fVehicleCode)
         fields.remove(FieldKey.driverLicenseName)
         fields.remove(FieldKey.givenName)

@@ -5,9 +5,9 @@ import com.ajohnson.dlparserkotlin.models.FieldKey
 /**
  * Published 03-2005.
  */
-class VersionThreeParser: DLParser {
+internal class VersionThreeParser(data: String): DLParser(data) {
 
-    constructor(data: String): super(data) {
+    init {
         fields.remove(FieldKey.firstName)
         fields.remove(FieldKey.middleName)
         fields.remove(FieldKey.lastNameTruncation)

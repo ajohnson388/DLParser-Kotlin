@@ -6,9 +6,9 @@ import com.ajohnson.dlparserkotlin.models.FieldKey
 /**
  * Published 2000.
  */
-class VersionOneParser: DLParser {
+internal class VersionOneParser(data: String): DLParser(data) {
 
-    constructor(data: String): super(data) {
+    init {
         fields.remove(FieldKey.jVehicleClass)
         fields.remove(FieldKey.jRestrictionCode)
         fields.remove(FieldKey.jEndorsementCode)

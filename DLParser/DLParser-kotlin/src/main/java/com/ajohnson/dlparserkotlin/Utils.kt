@@ -5,7 +5,7 @@ import kotlin.math.round
 /**
  * Utility functions used through out the framework.
  */
-object Utils {
+internal object Utils {
 
     fun firstRegexMatch(pattern: String, data: String): String? {
         val regex = Regex(pattern, RegexOption.IGNORE_CASE)

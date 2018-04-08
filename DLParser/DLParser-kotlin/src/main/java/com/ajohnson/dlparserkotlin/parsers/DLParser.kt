@@ -8,7 +8,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Created by ajohnson on 4/7/18.
+ * The primary class for parsing driver license data. This class automatically parses based on the
+ * version number
  */
 open class DLParser(val data: String) {
 
@@ -17,7 +18,7 @@ open class DLParser(val data: String) {
      * field should be modified in subclasses for version-specific
      * field changes.
      * */
-    val fields: MutableMap<FieldKey, String> = mutableMapOf(
+    protected val fields: MutableMap<FieldKey, String> = mutableMapOf(
         FieldKey.jVehicleClass to                "DCA",
         FieldKey.jRestrictionCode to             "DCB",
         FieldKey.jEndorsementCode to             "DCD",
@@ -72,17 +73,17 @@ open class DLParser(val data: String) {
      * The version number detected in the driver license data or nil
      * if the data is not AAMVA compliant.
      */
-    val versionNumber get() = Utils.firstRegexMatch("\\d{6}(\\d{2})\\w+", data)?.toInt()
+    private val versionNumber get() = Utils.firstRegexMatch("\\d{6}(\\d{2})\\w+", data)?.toInt()
 
     /**
     The number of subfiles found in the driver license data.
      */
-    val subfileCount get() = Utils.firstRegexMatch("\\d{8}(\\d{2})\\w+", data)?.toInt()
+    private val subfileCount get() = Utils.firstRegexMatch("\\d{8}(\\d{2})\\w+", data)?.toInt()
 
-    open val unitedStatesDateFormat get() = "MMddyyyy"
-    open val canadaDateFormat get() = "yyyyMMdd"
+    protected open val unitedStatesDateFormat get() = "MMddyyyy"
+    protected open val canadaDateFormat get() = "yyyyMMdd"
 
-    val dateFormat get() = when (parsedCountry) {
+    private val dateFormat get() = when (parsedCountry) {
         IssuingCountry.UNITED_STATES -> unitedStatesDateFormat
         IssuingCountry.CANADA -> canadaDateFormat
         else -> unitedStatesDateFormat
@@ -94,6 +95,8 @@ open class DLParser(val data: String) {
         3 ->  VersionThreeParser(data)
         4 ->  VersionFourParser(data)
         5 ->  VersionFiveParser(data)
+        6 ->  VersionSixParser(data)
+        7 ->  VersionSevenParser(data)
         8 ->  VersionEightParser(data)
         9 ->  VersionNineParser(data)
         else -> DLParser(data)
@@ -155,36 +158,35 @@ open class DLParser(val data: String) {
         )
     }
 
-
-    open fun parseString(key: FieldKey): String? {
+    protected open fun parseString(key: FieldKey): String? {
         fields[key]?.let {
             return Utils.firstRegexMatch("$it(.+)\\b", data)
         } ?: return null
     }
 
-    open fun parseDouble(key: FieldKey): Double? {
+    protected open fun parseDouble(key: FieldKey): Double? {
         fields[key]?.let {
             return Utils.firstRegexMatch("$it(\\w+)\\b", data)?.toDoubleOrNull()
         } ?: return null
     }
 
-    open fun parseDate(key: FieldKey): Date? {
+    protected open fun parseDate(key: FieldKey): Date? {
         val dateString = parseString(key)
         if (dateString.isNullOrEmpty()) return null
         return SimpleDateFormat(dateFormat, Locale.US).parse(dateString)
     }
 
-    open fun parseBoolean(key: FieldKey): Boolean? {
+    protected open fun parseBoolean(key: FieldKey): Boolean? {
         val rawValue = parseString(key) ?: return null
         return rawValue == "1"
     }
 
-    open val parsedFirstName get() =
+    protected open val parsedFirstName get() =
         parseString(FieldKey.firstName)
         ?: parseString(FieldKey.givenName)?.split(",")?.lastOrNull()?.trim()
         ?: parseString(FieldKey.driverLicenseName)?.split(",")?.lastOrNull()?.trim()
 
-    open val parsedMiddleNames: List<String> get() {
+    protected open val parsedMiddleNames: List<String> get() {
         parseString(FieldKey.middleName)?.let {
             return listOf(it)
         }
@@ -201,39 +203,39 @@ open class DLParser(val data: String) {
         return listOf()
     }
 
-    open val parsedLastName get() = parseString(FieldKey.lastName)
+    protected open val parsedLastName get() = parseString(FieldKey.lastName)
         ?: parseString(FieldKey.driverLicenseName)?.split(",")?.lastOrNull()?.trim()
 
-    open val parsedNameSuffix: NameSuffix? get() {
+    protected open val parsedNameSuffix: NameSuffix? get() {
         return NameSuffix.of(parseString(FieldKey.suffix) ?: return null)
     }
 
-    open fun parseTruncation(key: FieldKey): Truncation? {
+    protected open fun parseTruncation(key: FieldKey): Truncation? {
         parseString(key)?.let {
             return Truncation.of(it)
         } ?: return null
     }
 
-    open val parsedCountry: IssuingCountry? get() {
+    protected open val parsedCountry: IssuingCountry? get() {
         return IssuingCountry.of(parseString(FieldKey.country) ?: return null)
     }
 
-    open val parsedGender: Gender? get() {
+    protected open val parsedGender: Gender? get() {
         return Gender.of(parseString(FieldKey.gender) ?: return null)
     }
 
-    open val parsedEyeColor: EyeColor? get() {
+    protected open val parsedEyeColor: EyeColor? get() {
         return EyeColor.of(parseString(FieldKey.eyeColor) ?: return null)
     }
 
-    open val parsedHairColor: HairColor? get() {
+    protected open val parsedHairColor: HairColor? get() {
         return HairColor.of(parseString(FieldKey.hairColor) ?: return null)
     }
 
     /**
      * Returns the height in inches.
      */
-    open val parsedHeight: Double? get() {
+    protected open val parsedHeight: Double? get() {
         val heightString = parseString(FieldKey.heightInches) ?: return null
         val height = heightString.split(" ")
                 .firstOrNull()?.toDoubleOrNull() ?: return null
@@ -244,7 +246,7 @@ open class DLParser(val data: String) {
     /**
      * Returns the weight in pounds.
      * */
-    open val parsedWeight: Weight? get() {
+    protected open val parsedWeight: Weight? get() {
         parseString(FieldKey.weightPounds)?.toDoubleOrNull()?.let {
             return Weight(pounds=it)
         }

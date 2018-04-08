@@ -3,7 +3,7 @@ package com.ajohnson.dlparserkotlin.models
 /**
  * Keys used to map license data to the license model.
  */
-enum class FieldKey {
+internal enum class FieldKey {
     firstName,
     lastName,
     middleName,
