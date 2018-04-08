@@ -13,5 +13,7 @@ object Utils {
         return match?.trim()
     }
     
-    fun inchesFromCentimeters(centimeters: Double): Double = round(0.393701* centimeters)
+    fun inchesFromCentimeters(centimeters: Double): Double = round(0.393701 * centimeters)
+
+    fun poundsFromKilograms(kilograms: Double): Double = round(2.20462 * kilograms)
 }

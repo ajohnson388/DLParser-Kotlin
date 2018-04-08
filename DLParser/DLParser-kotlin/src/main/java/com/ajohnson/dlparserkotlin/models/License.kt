@@ -29,8 +29,8 @@ data class License(
         var race: String? = null,
         var gender: Gender? = null,
         var eyeColor: EyeColor? = null,
-        var height: List<Double> = listOf(),  // Two elements if range, One if exact, inches
-        var weight: List<Double> = listOf(),  // Two elements if range, One if exact, pounds
+        var height: Double? = null,
+        var weight: Weight? = null,
         var hairColor: HairColor?,
 
         var placeOfBirth: String? = null,

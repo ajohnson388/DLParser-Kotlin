@@ -1,5 +1,6 @@
 package com.ajohnson.dlparserkotlin.parsers
 
+import com.ajohnson.dlparserkotlin.Utils
 import com.ajohnson.dlparserkotlin.models.FieldKey
 
 /**
@@ -24,6 +25,7 @@ class VersionOneParser: DLParser {
         fields[FieldKey.givenNameAlias] = "DBP"
         fields[FieldKey.suffixAlias] = "DBR"
         fields[FieldKey.suffix] = "DAE"
+        fields[FieldKey.heightCentimeters] = "DAV"
         fields.remove(FieldKey.weightRange)
         fields.remove(FieldKey.race)
         fields[FieldKey.sVehicleCode] = "PAA"
@@ -41,4 +43,18 @@ class VersionOneParser: DLParser {
     }
 
     override val unitedStatesDateFormat = "yyyyMMdd"
+
+    override val parsedHeight: Double? get() {
+        // Check for cm
+        parseString(FieldKey.heightCentimeters)?.toDoubleOrNull()?.let {
+            return Utils.inchesFromCentimeters(it)
+        }
+
+        // Check for ft/in
+        val rawHeight = parseString(FieldKey.heightInches)?.toIntOrNull() ?: return null
+        val feet = rawHeight / 100
+        val inches = rawHeight - (feet * 100)
+        val totalInches = (feet * 12) + inches
+        return totalInches.toDouble()
+    }
 }

@@ -156,34 +156,34 @@ open class DLParser(val data: String) {
     }
 
 
-    fun parseString(key: FieldKey): String? {
+    open fun parseString(key: FieldKey): String? {
         fields[key]?.let {
             return Utils.firstRegexMatch("$it(.+)\\b", data)
         } ?: return null
     }
 
-    fun parseDouble(key: FieldKey): Double? {
+    open fun parseDouble(key: FieldKey): Double? {
         fields[key]?.let {
             return Utils.firstRegexMatch("$it(\\w+)\\b", data)?.toDoubleOrNull()
         } ?: return null
     }
 
-    fun parseDate(key: FieldKey): Date? {
+    open fun parseDate(key: FieldKey): Date? {
         val dateString = parseString(key)
         if (dateString.isNullOrEmpty()) return null
         return SimpleDateFormat(dateFormat, Locale.US).parse(dateString)
     }
 
-    fun parseBoolean(key: FieldKey): Boolean? {
+    open fun parseBoolean(key: FieldKey): Boolean? {
         return null  // TODO
     }
 
-    val parsedFirstName get() =
+    open val parsedFirstName get() =
         parseString(FieldKey.firstName)
         ?: parseString(FieldKey.givenName)?.split(",")?.lastOrNull()?.trim()
         ?: parseString(FieldKey.driverLicenseName)?.split(",")?.lastOrNull()?.trim()
 
-    val parsedMiddleNames: List<String> get() {
+    open val parsedMiddleNames: List<String> get() {
         parseString(FieldKey.middleName)?.let {
             return listOf(it)
         }
@@ -200,61 +200,59 @@ open class DLParser(val data: String) {
         return listOf()
     }
 
-    val parsedLastName get() = parseString(FieldKey.lastName)
+    open val parsedLastName get() = parseString(FieldKey.lastName)
         ?: parseString(FieldKey.driverLicenseName)?.split(",")?.lastOrNull()?.trim()
 
-    val parsedNameSuffix: NameSuffix? get() {
+    open val parsedNameSuffix: NameSuffix? get() {
         return NameSuffix.of(parseString(FieldKey.suffix) ?: return null)
     }
 
-    fun parseTruncation(key: FieldKey): Truncation? {
+    open fun parseTruncation(key: FieldKey): Truncation? {
         parseString(key)?.let {
             return Truncation.of(it)
         } ?: return null
     }
 
-    val parsedCountry: IssuingCountry? get() {
+    open val parsedCountry: IssuingCountry? get() {
         return IssuingCountry.of(parseString(FieldKey.country) ?: return null)
     }
 
-    val parsedGender: Gender? get() {
+    open val parsedGender: Gender? get() {
         return Gender.of(parseString(FieldKey.gender) ?: return null)
     }
 
-    val parsedEyeColor: EyeColor? get() {
+    open val parsedEyeColor: EyeColor? get() {
         return EyeColor.of(parseString(FieldKey.eyeColor) ?: return null)
     }
 
-    val parsedHairColor: HairColor? get() {
+    open val parsedHairColor: HairColor? get() {
         return HairColor.of(parseString(FieldKey.hairColor) ?: return null)
     }
 
     /**
      * Returns the height in inches.
      */
-    val parsedHeight: List<Double> get() {
-        return listOf()
-        // Parse height range?
-        // Parse height inches
-        // Parse height centimeters
-
-        // TODO: Account height formats
-//        guard
-//        let heightString = parseString(key: FieldKey.heightInches),
-//        let height = parseDouble(key: FieldKey.heightInches) else {
-//            return nil
-//        }
-//        return heightString.contains("cm")
-//            ? UnitConverter.inches(from: height) : height
+    open val parsedHeight: Double? get() {
+        val heightString = parseString(FieldKey.heightInches) ?: return null
+        val height = heightString.split(" ")
+                .firstOrNull()?.toDoubleOrNull() ?: return null
+        return if (heightString.contains("cm"))
+            Utils.inchesFromCentimeters(height) else height
     }
 
     /**
      * Returns the weight in pounds.
      * */
-    val parsedWeight: List<Double> get() {
-        // Parse weight range
-        // Parse weight pounds
-        // Parse weight kilograms
-        return listOf()  // TODO
+    open val parsedWeight: Weight? get() {
+        parseString(FieldKey.weightPounds)?.toDoubleOrNull()?.let {
+            return Weight(pounds=it)
+        }
+        parseString(FieldKey.weightKilograms)?.toDoubleOrNull()?.let {
+            return Weight(pounds=Utils.poundsFromKilograms(it))
+        }
+        parseString(FieldKey.weightRange)?.toIntOrNull()?.let {
+            return Weight(WeightRange(it))
+        }
+        return null
     }
 }
