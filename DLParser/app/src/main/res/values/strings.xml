@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DLParserExample</string>
+    <string name="permission_camera">DLParser needs to access your camera to scan the PDF417 barcodes on driver license in order to demonstrate the parser\'s capability.</string>
+    <string name="ok">Okay</string>
 </resources>

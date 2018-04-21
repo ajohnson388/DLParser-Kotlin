@@ -18,7 +18,7 @@ open class DLParser(val data: String) {
      * field should be modified in subclasses for version-specific
      * field changes.
      * */
-    protected val fields: MutableMap<FieldKey, String> = mutableMapOf(
+    public val fields: MutableMap<FieldKey, String> = mutableMapOf(
         FieldKey.jVehicleClass to                "DCA",
         FieldKey.jRestrictionCode to             "DCB",
         FieldKey.jEndorsementCode to             "DCD",
@@ -73,7 +73,7 @@ open class DLParser(val data: String) {
      * The version number detected in the driver license data or nil
      * if the data is not AAMVA compliant.
      */
-    private val versionNumber get() = Utils.firstRegexMatch("\\d{6}(\\d{2})\\w+", data)?.toInt()
+    val versionNumber get() = Utils.firstRegexMatch("\\d{6}(\\d{2})\\w+", data)?.toInt()
 
     /**
     The number of subfiles found in the driver license data.
