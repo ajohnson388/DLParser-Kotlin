@@ -1,22 +1,22 @@
 package com.ajohnson.dlparserexample
 
 import android.Manifest
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.PermissionChecker
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.SurfaceView
+import android.view.View
+import com.ajohnson.dlparserkotlin.models.License
+import com.ajohnson.dlparserkotlin.parsers.DLParser
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
-import android.support.design.widget.Snackbar
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.PermissionChecker
-import android.view.View
-import com.ajohnson.dlparserkotlin.models.License
-import com.ajohnson.dlparserkotlin.parsers.DLParser
 
 
 class MainActivity : AppCompatActivity(), Detector.Processor<Barcode> {
@@ -96,7 +96,10 @@ class MainActivity : AppCompatActivity(), Detector.Processor<Barcode> {
 
     fun processBarcode(barcode: Barcode): License? {
         val license = DLParser(barcode.rawValue).parse()
-        return if (license.isAcceptable) license else null
+        return if (license.isAcceptable) license else kotlin.run {
+            requestCameraPermissionsIfNeeded()
+            return null
+        }
     }
 
     override fun release() {
