@@ -73,23 +73,28 @@ open class DLParser(val data: String) {
      * The version number detected in the driver license data or nil
      * if the data is not AAMVA compliant.
      */
-    val versionNumber get() = Utils.firstRegexMatch("\\d{6}(\\d{2})\\w+", data)?.toInt()
+//    val versionNumber get() = Utils.firstRegexMatch("\\d{6}(\\d{2})\\w+", data)?.toInt()
+    val versionNumber: Int? get() {
+        val matches = Regex("\\D(\\d{6}(\\d{2}))").find(data)
+        val value = matches?.value
+        return value?.substring(7)?.toIntOrNull()
+    }
 
-    /**
-    The number of subfiles found in the driver license data.
-     */
-    private val subfileCount get() = Utils.firstRegexMatch("\\d{8}(\\d{2})\\w+", data)?.toInt()
+        /**
+        The number of subfiles found in the driver license data.
+         */
+        private val subfileCount get() = Utils.firstRegexMatch("\\d{8}(\\d{2})\\w+", data)?.toInt()
 
-    protected open val unitedStatesDateFormat get() = "MMddyyyy"
-    protected open val canadaDateFormat get() = "yyyyMMdd"
+        protected open val unitedStatesDateFormat get() = "MMddyyyy"
+        protected open val canadaDateFormat get() = "yyyyMMdd"
 
-    private val dateFormat get() = when (parsedCountry) {
+        private val dateFormat get() = when (parsedCountry) {
         IssuingCountry.UNITED_STATES -> unitedStatesDateFormat
         IssuingCountry.CANADA -> canadaDateFormat
         else -> unitedStatesDateFormat
     }
 
-    private val versionParser get() = when (versionNumber) {
+        private val versionParser get() = when (versionNumber) {
         1 ->  VersionOneParser(data)
         2 ->  VersionTwoParser(data)
         3 ->  VersionThreeParser(data)
@@ -102,91 +107,91 @@ open class DLParser(val data: String) {
         else -> DLParser(data)
     }
 
-    fun parse(): License {
-        val version = versionNumber
-        val parser = versionParser
-        return License(
-                parser.parsedFirstName,
-                parser.parsedMiddleNames,
-                parser.parsedLastName,
-                parser.parseString(FieldKey.firstNameAlias),
-                parser.parseString(FieldKey.givenNameAlias),
-                parser.parseString(FieldKey.lastNameAlias),
-                parser.parseString(FieldKey.suffixAlias),
-                parser.parsedNameSuffix,
-                parser.parseTruncation(FieldKey.firstNameTruncation),
-                parser.parseTruncation(FieldKey.middleNameTruncation),
-                parser.parseTruncation(FieldKey.lastNameTruncation),
-                parser.parseDate(FieldKey.expirationDate),
-                parser.parseDate(FieldKey.issueDate),
-                parser.parseDate(FieldKey.birthDate),
-                parser.parseDate(FieldKey.hazmatExpirationDate),
-                parser.parseDate(FieldKey.revisionDate),
-                parser.parseString(FieldKey.race),
-                parser.parsedGender,
-                parser.parsedEyeColor,
-                parser.parsedHeight,
-                parser.parsedWeight,
-                parser.parsedHairColor,
-                parser.parseString(FieldKey.placeOfBirth),
-                parser.parseString(FieldKey.streetAddress),
-                parser.parseString(FieldKey.streetAddressTwo),
-                parser.parseString(FieldKey.city),
-                parser.parseString(FieldKey.state),
-                parser.parseString(FieldKey.postalCode),
-                parser.parsedCountry,
-                parser.parseString(FieldKey.driverLicenseNumber),
-                parser.parseString(FieldKey.uniqueDocumentId),
-                parser.parseString(FieldKey.auditInformation),
-                parser.parseString(FieldKey.inventoryControlNumber),
-                parser.parseString(FieldKey.complianceType),
-                parser.parseBoolean(FieldKey.isOrganDonor),
-                parser.parseBoolean(FieldKey.isVeteran),
-                parser.parseBoolean(FieldKey.isTemporaryDocument),
-                parser.parseString(FieldKey.fVehicleCode),
-                parser.parseString(FieldKey.sVehicleCode),
-                parser.parseString(FieldKey.sRestrictionCode),
-                parser.parseString(FieldKey.sEndorsementCode),
-                parser.parseString(FieldKey.jVehicleClass),
-                parser.parseString(FieldKey.jRestrictionCode),
-                parser.parseString(FieldKey.jEndorsementCode),
-                parser.parseString(FieldKey.jVehicleClassDescription),
-                parser.parseString(FieldKey.jRestrictionCodeDescription),
-                parser.parseString(FieldKey.jEndorsementCodeDescription),
-                version,
-                data
-        )
-    }
+        fun parse(): License {
+            val version = versionNumber
+            val parser = versionParser
+            return License(
+                    parser.parsedFirstName,
+                    parser.parsedMiddleNames,
+                    parser.parsedLastName,
+                    parser.parseString(FieldKey.firstNameAlias),
+                    parser.parseString(FieldKey.givenNameAlias),
+                    parser.parseString(FieldKey.lastNameAlias),
+                    parser.parseString(FieldKey.suffixAlias),
+                    parser.parsedNameSuffix,
+                    parser.parseTruncation(FieldKey.firstNameTruncation),
+                    parser.parseTruncation(FieldKey.middleNameTruncation),
+                    parser.parseTruncation(FieldKey.lastNameTruncation),
+                    parser.parseDate(FieldKey.expirationDate),
+                    parser.parseDate(FieldKey.issueDate),
+                    parser.parseDate(FieldKey.birthDate),
+                    parser.parseDate(FieldKey.hazmatExpirationDate),
+                    parser.parseDate(FieldKey.revisionDate),
+                    parser.parseString(FieldKey.race),
+                    parser.parsedGender,
+                    parser.parsedEyeColor,
+                    parser.parsedHeight,
+                    parser.parsedWeight,
+                    parser.parsedHairColor,
+                    parser.parseString(FieldKey.placeOfBirth),
+                    parser.parseString(FieldKey.streetAddress),
+                    parser.parseString(FieldKey.streetAddressTwo),
+                    parser.parseString(FieldKey.city),
+                    parser.parseString(FieldKey.state),
+                    parser.parseString(FieldKey.postalCode),
+                    parser.parsedCountry,
+                    parser.parseString(FieldKey.driverLicenseNumber),
+                    parser.parseString(FieldKey.uniqueDocumentId),
+                    parser.parseString(FieldKey.auditInformation),
+                    parser.parseString(FieldKey.inventoryControlNumber),
+                    parser.parseString(FieldKey.complianceType),
+                    parser.parseBoolean(FieldKey.isOrganDonor),
+                    parser.parseBoolean(FieldKey.isVeteran),
+                    parser.parseBoolean(FieldKey.isTemporaryDocument),
+                    parser.parseString(FieldKey.fVehicleCode),
+                    parser.parseString(FieldKey.sVehicleCode),
+                    parser.parseString(FieldKey.sRestrictionCode),
+                    parser.parseString(FieldKey.sEndorsementCode),
+                    parser.parseString(FieldKey.jVehicleClass),
+                    parser.parseString(FieldKey.jRestrictionCode),
+                    parser.parseString(FieldKey.jEndorsementCode),
+                    parser.parseString(FieldKey.jVehicleClassDescription),
+                    parser.parseString(FieldKey.jRestrictionCodeDescription),
+                    parser.parseString(FieldKey.jEndorsementCodeDescription),
+                    version,
+                    data
+            )
+        }
 
-    internal open fun parseString(key: FieldKey): String? {
-        fields[key]?.let {
-            return Utils.firstRegexMatch("$it(.+)\\b", data)
-        } ?: return null
-    }
+        internal open fun parseString(key: FieldKey): String? {
+            fields[key]?.let {
+                return Regex("$it(.+)\\b").find(data)?.value?.removePrefix(it)
+            } ?: return null
+        }
 
-    internal open fun parseDouble(key: FieldKey): Double? {
-        fields[key]?.let {
-            return Utils.firstRegexMatch("$it(\\w+)\\b", data)?.toDoubleOrNull()
-        } ?: return null
-    }
+        internal open fun parseDouble(key: FieldKey): Double? {
+            fields[key]?.let {
+                return Regex("$it(\\w+)\\b").find(data)?.value?.removePrefix(it)?.toDoubleOrNull()
+            } ?: return null
+        }
 
-    internal open fun parseDate(key: FieldKey): Date? {
-        val dateString = parseString(key)
-        if (dateString.isNullOrEmpty()) return null
-        return SimpleDateFormat(dateFormat, Locale.US).parse(dateString)
-    }
+        internal open fun parseDate(key: FieldKey): Date? {
+            val dateString = parseString(key)
+            if (dateString.isNullOrEmpty()) return null
+            return SimpleDateFormat(dateFormat, Locale.US).parse(dateString)
+        }
 
-    internal open fun parseBoolean(key: FieldKey): Boolean? {
-        val rawValue = parseString(key) ?: return null
-        return rawValue == "1"
-    }
+        internal open fun parseBoolean(key: FieldKey): Boolean? {
+            val rawValue = parseString(key) ?: return null
+            return rawValue == "1"
+        }
 
-    protected open val parsedFirstName get() =
+        protected open val parsedFirstName get() =
         parseString(FieldKey.firstName)
-        ?: parseString(FieldKey.givenName)?.split(",")?.lastOrNull()?.trim()
-        ?: parseString(FieldKey.driverLicenseName)?.split(",")?.lastOrNull()?.trim()
+                ?: parseString(FieldKey.givenName)?.split(",")?.lastOrNull()?.trim()
+                ?: parseString(FieldKey.driverLicenseName)?.split(",")?.lastOrNull()?.trim()
 
-    protected open val parsedMiddleNames: List<String> get() {
+        protected open val parsedMiddleNames: List<String> get() {
         parseString(FieldKey.middleName)?.let {
             return listOf(it)
         }
@@ -203,39 +208,39 @@ open class DLParser(val data: String) {
         return listOf()
     }
 
-    protected open val parsedLastName get() = parseString(FieldKey.lastName)
+        protected open val parsedLastName get() = parseString(FieldKey.lastName)
         ?: parseString(FieldKey.driverLicenseName)?.split(",")?.lastOrNull()?.trim()
 
-    protected open val parsedNameSuffix: NameSuffix? get() {
+        protected open val parsedNameSuffix: NameSuffix? get() {
         return NameSuffix.of(parseString(FieldKey.suffix) ?: return null)
     }
 
-    internal open fun parseTruncation(key: FieldKey): Truncation? {
-        parseString(key)?.let {
-            return Truncation.of(it)
-        } ?: return null
-    }
+        internal open fun parseTruncation(key: FieldKey): Truncation? {
+            parseString(key)?.let {
+                return Truncation.of(it)
+            } ?: return null
+        }
 
-    protected open val parsedCountry: IssuingCountry? get() {
+        protected open val parsedCountry: IssuingCountry? get() {
         return IssuingCountry.of(parseString(FieldKey.country) ?: return null)
     }
 
-    protected open val parsedGender: Gender? get() {
+        protected open val parsedGender: Gender? get() {
         return Gender.of(parseString(FieldKey.gender) ?: return null)
     }
 
-    protected open val parsedEyeColor: EyeColor? get() {
+        protected open val parsedEyeColor: EyeColor? get() {
         return EyeColor.of(parseString(FieldKey.eyeColor) ?: return null)
     }
 
-    protected open val parsedHairColor: HairColor? get() {
+        protected open val parsedHairColor: HairColor? get() {
         return HairColor.of(parseString(FieldKey.hairColor) ?: return null)
     }
 
-    /**
-     * Returns the height in inches.
-     */
-    protected open val parsedHeight: Double? get() {
+        /**
+         * Returns the height in inches.
+         */
+        protected open val parsedHeight: Double? get() {
         val heightString = parseString(FieldKey.heightInches) ?: return null
         val height = heightString.split(" ")
                 .firstOrNull()?.toDoubleOrNull() ?: return null
@@ -243,10 +248,10 @@ open class DLParser(val data: String) {
             Utils.inchesFromCentimeters(height) else height
     }
 
-    /**
-     * Returns the weight in pounds.
-     * */
-    protected open val parsedWeight: Weight? get() {
+        /**
+         * Returns the weight in pounds.
+         * */
+        protected open val parsedWeight: Weight? get() {
         parseString(FieldKey.weightPounds)?.toDoubleOrNull()?.let {
             return Weight(pounds=it)
         }
