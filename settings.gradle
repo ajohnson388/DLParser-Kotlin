@@ -1,1 +1,1 @@
-include ':app', ':DLParser'
+include ':DLParser'
