@@ -18,7 +18,7 @@ open class DLParser(val data: String) {
      * field should be modified in subclasses for version-specific
      * field changes.
      * */
-    public val fields: MutableMap<FieldKey, String> = mutableMapOf(
+    internal val fields: MutableMap<FieldKey, String> = mutableMapOf(
         FieldKey.jVehicleClass to                "DCA",
         FieldKey.jRestrictionCode to             "DCB",
         FieldKey.jEndorsementCode to             "DCD",
@@ -158,25 +158,25 @@ open class DLParser(val data: String) {
         )
     }
 
-    protected open fun parseString(key: FieldKey): String? {
+    internal open fun parseString(key: FieldKey): String? {
         fields[key]?.let {
             return Utils.firstRegexMatch("$it(.+)\\b", data)
         } ?: return null
     }
 
-    protected open fun parseDouble(key: FieldKey): Double? {
+    internal open fun parseDouble(key: FieldKey): Double? {
         fields[key]?.let {
             return Utils.firstRegexMatch("$it(\\w+)\\b", data)?.toDoubleOrNull()
         } ?: return null
     }
 
-    protected open fun parseDate(key: FieldKey): Date? {
+    internal open fun parseDate(key: FieldKey): Date? {
         val dateString = parseString(key)
         if (dateString.isNullOrEmpty()) return null
         return SimpleDateFormat(dateFormat, Locale.US).parse(dateString)
     }
 
-    protected open fun parseBoolean(key: FieldKey): Boolean? {
+    internal open fun parseBoolean(key: FieldKey): Boolean? {
         val rawValue = parseString(key) ?: return null
         return rawValue == "1"
     }
@@ -210,7 +210,7 @@ open class DLParser(val data: String) {
         return NameSuffix.of(parseString(FieldKey.suffix) ?: return null)
     }
 
-    protected open fun parseTruncation(key: FieldKey): Truncation? {
+    internal open fun parseTruncation(key: FieldKey): Truncation? {
         parseString(key)?.let {
             return Truncation.of(it)
         } ?: return null

@@ -21,5 +21,6 @@ class MockBuilder(val versionParser: DLParser) {
                 String.format("%2d", version) +
                 jurisdictionVersionNumber +
                 numberOfSubfiles
+        return lineOne.plus(lineTwo)
     }
 }
