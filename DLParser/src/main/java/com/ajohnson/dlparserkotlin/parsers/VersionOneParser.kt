@@ -6,7 +6,7 @@ import com.ajohnson.dlparserkotlin.models.FieldKey
 /**
  * Published 2000.
  */
-internal class VersionOneParser(data: String): DLParser(data) {
+internal class VersionOneParser(data: String) : DLParser(data) {
 
     init {
         fields.remove(FieldKey.JURISDICTION_VEHICLE_CLASS)
@@ -44,17 +44,18 @@ internal class VersionOneParser(data: String): DLParser(data) {
 
     override val unitedStatesDateFormat = "yyyyMMdd"
 
-    override val parsedHeight: Double? get() {
-        // Check for cm
-        parseString(FieldKey.HEIGHT_CENTIMETERS)?.toDoubleOrNull()?.let {
-            return Utils.inchesFromCentimeters(it)
-        }
+    override val parsedHeight: Double?
+        get() {
+            // Check for cm
+            parseString(FieldKey.HEIGHT_CENTIMETERS)?.toDoubleOrNull()?.let {
+                return Utils.inchesFromCentimeters(it)
+            }
 
-        // Check for ft/in
-        val rawHeight = parseString(FieldKey.HEIGHT_INCHES)?.toIntOrNull() ?: return null
-        val feet = rawHeight / 100
-        val inches = rawHeight - (feet * 100)
-        val totalInches = (feet * 12) + inches
-        return totalInches.toDouble()
-    }
+            // Check for ft/in
+            val rawHeight = parseString(FieldKey.HEIGHT_INCHES)?.toIntOrNull() ?: return null
+            val feet = rawHeight / 100
+            val inches = rawHeight - (feet * 100)
+            val totalInches = (feet * 12) + inches
+            return totalInches.toDouble()
+        }
 }

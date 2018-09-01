@@ -5,7 +5,7 @@ import com.ajohnson.dlparserkotlin.models.FieldKey
 /**
  * Published 09-2003.
  */
-internal class VersionTwoParser(data: String): DLParser(data) {
+internal class VersionTwoParser(data: String) : DLParser(data) {
     
     init {
         fields.remove(FieldKey.FIRST_NAME)

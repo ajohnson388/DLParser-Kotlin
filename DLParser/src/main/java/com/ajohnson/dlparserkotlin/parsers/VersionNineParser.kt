@@ -5,7 +5,7 @@ import com.ajohnson.dlparserkotlin.models.FieldKey
 /**
  * Published 2016.
  */
-internal class VersionNineParser(data: String): DLParser(data) {
+internal class VersionNineParser(data: String) : DLParser(data) {
 
     init {
         fields.remove(FieldKey.FEDERAL_VEHICLE_CODE)

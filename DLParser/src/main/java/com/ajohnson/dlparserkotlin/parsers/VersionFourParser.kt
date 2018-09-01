@@ -5,7 +5,7 @@ import com.ajohnson.dlparserkotlin.models.FieldKey
 /**
  * Published 07-2009.
  */
-internal class VersionFourParser(data: String): DLParser(data) {
+internal class VersionFourParser(data: String) : DLParser(data) {
     
     init {
         fields.remove(FieldKey.IS_ORGAN_DONOR)
