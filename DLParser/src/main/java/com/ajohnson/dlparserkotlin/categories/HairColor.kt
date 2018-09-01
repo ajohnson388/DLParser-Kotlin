@@ -16,6 +16,6 @@ enum class HairColor(val rawValue: String) {
 
     companion object {
         fun of(rawValue: String): HairColor? =
-                HairColor.values().firstOrNull { it.rawValue == rawValue }
+            HairColor.values().firstOrNull { it.rawValue == rawValue }
     }
 }

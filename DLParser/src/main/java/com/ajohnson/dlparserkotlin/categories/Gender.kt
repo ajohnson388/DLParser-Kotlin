@@ -10,6 +10,6 @@ enum class Gender(val rawValue: String) {
 
     companion object {
         fun of(rawValue: String): Gender? =
-                Gender.values().firstOrNull { it.rawValue == rawValue }
+            Gender.values().firstOrNull { it.rawValue == rawValue }
     }
 }

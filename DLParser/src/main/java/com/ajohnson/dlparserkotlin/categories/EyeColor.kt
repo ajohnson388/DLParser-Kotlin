@@ -17,6 +17,6 @@ enum class EyeColor(val rawValue: String) {
 
     companion object {
         fun of(rawValue: String): EyeColor? =
-                EyeColor.values().firstOrNull { it.rawValue == rawValue }
+            EyeColor.values().firstOrNull { it.rawValue == rawValue }
     }
 }

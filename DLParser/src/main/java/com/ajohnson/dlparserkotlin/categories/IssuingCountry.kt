@@ -10,6 +10,6 @@ enum class IssuingCountry(val rawValue: String) {
 
     companion object {
         fun of(rawValue: String): IssuingCountry? =
-                IssuingCountry.values().firstOrNull { it.rawValue == rawValue }
+            IssuingCountry.values().firstOrNull { it.rawValue == rawValue }
     }
 }
