@@ -8,19 +8,19 @@ import com.ajohnson.dlparserkotlin.models.FieldKey
 internal class VersionThreeParser(data: String): DLParser(data) {
 
     init {
-        fields.remove(FieldKey.firstName)
-        fields.remove(FieldKey.middleName)
-        fields.remove(FieldKey.lastNameTruncation)
-        fields.remove(FieldKey.firstNameTruncation)
-        fields.remove(FieldKey.middleNameTruncation)
-        fields.remove(FieldKey.complianceType)
-        fields.remove(FieldKey.revisionDate)
-        fields.remove(FieldKey.hazmatExpirationDate)
-        fields.remove(FieldKey.weightPounds)
-        fields.remove(FieldKey.weightKilograms)
-        fields.remove(FieldKey.isTemporaryDocument)
-        fields.remove(FieldKey.isOrganDonor)
-        fields.remove(FieldKey.isVeteran)
-        fields.remove(FieldKey.driverLicenseName)
+        fields.remove(FieldKey.FIRST_NAME)
+        fields.remove(FieldKey.MIDDLE_NAME)
+        fields.remove(FieldKey.LAST_NAME_TRUNCATION)
+        fields.remove(FieldKey.FIRST_NAME_TRUNCATION)
+        fields.remove(FieldKey.MIDDLE_NAME_TRUNCATION)
+        fields.remove(FieldKey.COMPLIANCE_TYPE)
+        fields.remove(FieldKey.REVISION_DATE)
+        fields.remove(FieldKey.HAZMAT_EXPIRATION_DATE)
+        fields.remove(FieldKey.WEIGHT_POUNDS)
+        fields.remove(FieldKey.WEIGHT_KILOGRAMS)
+        fields.remove(FieldKey.IS_TEMPORARY_DOCUMENT)
+        fields.remove(FieldKey.IS_ORGAN_DONOR)
+        fields.remove(FieldKey.IS_VETERAN)
+        fields.remove(FieldKey.DRIVER_LICENSE_NAME)
     }
 }

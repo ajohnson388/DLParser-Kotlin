@@ -8,8 +8,8 @@ import com.ajohnson.dlparserkotlin.models.FieldKey
 internal class VersionSevenParser(data: String): DLParser(data) {
 
     init {
-        fields.remove(FieldKey.fVehicleCode)
-        fields.remove(FieldKey.driverLicenseName)
-        fields.remove(FieldKey.givenName)
+        fields.remove(FieldKey.FEDERAL_VEHICLE_CODE)
+        fields.remove(FieldKey.DRIVER_LICENSE_NAME)
+        fields.remove(FieldKey.GIVEN_NAME)
     }
 }
