@@ -16,6 +16,7 @@ internal enum class FieldKey {
     GIVEN_NAME_ALIAS,
     SUFFIX_ALIAS,
     SUFFIX,
+    SUFFIX_2,
 
     MIDDLE_NAME_TRUNCATION,
     FIRST_NAME_TRUNCATION,
