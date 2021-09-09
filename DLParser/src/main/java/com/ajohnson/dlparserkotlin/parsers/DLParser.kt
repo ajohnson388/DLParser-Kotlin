@@ -47,7 +47,8 @@ open class DLParser(val data: String) {
         FieldKey.INVENTORY_CONTROL_NUMBER to "DCK",
         FieldKey.LAST_NAME_ALIAS to "DBN",
         FieldKey.GIVEN_NAME_ALIAS to "DBG",
-        FieldKey.SUFFIX to "DBS", //.name toDO toOr DCU
+        FieldKey.SUFFIX to "DBS",
+        FieldKey.SUFFIX_2 to "DCU",
         FieldKey.WEIGHT_RANGE to "DCE",
         FieldKey.RACE to "DCL",
         FieldKey.STANDARD_VEHICLE_CODE to "DCM",
@@ -114,6 +115,7 @@ open class DLParser(val data: String) {
         val version = versionNumber
         val parser = versionParser
         return License(
+            parser.parsedFullName,
             parser.parsedFirstName,
             parser.parsedMiddleNames,
             parser.parsedLastName,
@@ -189,6 +191,31 @@ open class DLParser(val data: String) {
         return rawValue == "1"
     }
 
+    protected open val parsedFullName: String
+        get() {
+            var hasFirstNameField = false
+            val firstNameParts: List<String>
+            if (parseString(FieldKey.FIRST_NAME) != null) {
+                firstNameParts = listOf(parseString(FieldKey.FIRST_NAME)!!)
+                hasFirstNameField = true
+            }
+            else {
+                firstNameParts = parseString(FieldKey.GIVEN_NAME)?.split(",")?.map { it.trim() }
+                    ?: parseString(FieldKey.DRIVER_LICENSE_NAME)?.split(",")?.map { it.trim() }
+                            ?: listOf()
+            }
+
+            val nameParts = mutableListOf<String>()
+            nameParts.addAll(firstNameParts)
+            if (hasFirstNameField) {
+                nameParts.addAll(parsedMiddleNames)
+            }
+            if (parsedLastName != null) nameParts.add(parsedLastName!!)
+            if (parsedNameSuffix != null) nameParts.add(parsedNameSuffix?.rawValue!!)
+
+            return nameParts.distinct().joinToString(" ")
+        }
+
     protected open val parsedFirstName
         get() =
             parseString(FieldKey.FIRST_NAME)
@@ -219,7 +246,7 @@ open class DLParser(val data: String) {
 
     protected open val parsedNameSuffix: NameSuffix?
         get() {
-            return NameSuffix.of(parseString(FieldKey.SUFFIX) ?: return null)
+            return NameSuffix.of(parseString(FieldKey.SUFFIX) ?: parseString(FieldKey.SUFFIX_2) ?: return null)
         }
 
     internal open fun parseTruncation(key: FieldKey): Truncation? {
