@@ -7,6 +7,7 @@ import java.util.*
  * A model for storing the parsed license data.
  * */
 data class License(
+    var fullName: String? = null,
     var firstName: String? = null,
     var middleNames: List<String> = listOf(),
     var lastName: String? = null,
