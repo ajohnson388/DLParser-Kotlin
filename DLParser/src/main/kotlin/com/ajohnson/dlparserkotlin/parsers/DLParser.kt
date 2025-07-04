@@ -69,6 +69,9 @@ open class DLParser(val data: String) {
         FieldKey.IS_TEMPORARY_DOCUMENT to "DDD",
         FieldKey.IS_ORGAN_DONOR to "DDK",
         FieldKey.IS_VETERAN to "DDL",
+        FieldKey.UNDER_EIGHTEEN_UNTIL_DATE to "DDH",
+        FieldKey.UNDER_NINETEEN_UNTIL_DATE to "DDI",
+        FieldKey.UNDER_TWENTY_ONE_UNTIL_DATE to "DDJ",
         FieldKey.FEDERAL_VEHICLE_CODE to "DCH",
         FieldKey.DRIVER_LICENSE_NAME to "DAA",
         FieldKey.GIVEN_NAME to "DCT",
@@ -112,7 +115,6 @@ open class DLParser(val data: String) {
         }
 
     fun parse(): License {
-        val version = versionNumber
         val parser = versionParser
         return License(
             firstName = parser.parsedFirstName,
@@ -121,10 +123,10 @@ open class DLParser(val data: String) {
             givenNameAlias = parser.parseString(FieldKey.GIVEN_NAME_ALIAS),
             lastNameAlias = parser.parseString(FieldKey.LAST_NAME_ALIAS),
             suffixAlias = parser.parseString(FieldKey.SUFFIX_ALIAS),
-            suffix = parsedNameSuffix,
-            firstNameTruncation = parseEnum(FieldKey.FIRST_NAME_TRUNCATION),
-            middleNameTruncation = parseEnum(FieldKey.MIDDLE_NAME_TRUNCATION),
-            lastNameTruncation = parseEnum(FieldKey.LAST_NAME_TRUNCATION),
+            suffix = parser.parsedNameSuffix,
+            firstNameTruncation = parser.parseEnum(FieldKey.FIRST_NAME_TRUNCATION),
+            middleNameTruncation = parser.parseEnum(FieldKey.MIDDLE_NAME_TRUNCATION),
+            lastNameTruncation = parser.parseEnum(FieldKey.LAST_NAME_TRUNCATION),
             expirationDate = parser.parseDate(FieldKey.EXPIRATION_DATE),
             issueDate = parser.parseDate(FieldKey.ISSUE_DATE),
             birthdate = parser.parseDate(FieldKey.BIRTH_DATE),
@@ -133,24 +135,24 @@ open class DLParser(val data: String) {
             underEighteenUntilDate = parser.parseDate(FieldKey.UNDER_EIGHTEEN_UNTIL_DATE),
             underNineteenUntilDate = parser.parseDate(FieldKey.UNDER_NINETEEN_UNTIL_DATE),
             underTwentyOneUntilDate = parser.parseDate(FieldKey.UNDER_TWENTY_ONE_UNTIL_DATE),
-            race = parseEnum(FieldKey.RACE),
-            gender = parseEnum(FieldKey.GENDER),
-            eyeColor = parseEnum(FieldKey.EYE_COLOR),
+            race = parser.parseEnum(FieldKey.RACE),
+            gender = parser.parseEnum(FieldKey.GENDER),
+            eyeColor = parser.parseEnum(FieldKey.EYE_COLOR),
             height = parser.parsedHeight,
             weight = parser.parsedWeight,
-            hairColor = parseEnum(FieldKey.HAIR_COLOR),
+            hairColor = parser.parseEnum(FieldKey.HAIR_COLOR),
             placeOfBirth = parser.parseString(FieldKey.PLACE_OF_BIRTH),
             streetAddress = parser.parseString(FieldKey.STREET_ADDRESS),
             streetAddressTwo = parser.parseString(FieldKey.STREET_ADDRESS_TWO),
             city = parser.parseString(FieldKey.CITY),
             state = parser.parseString(FieldKey.STATE),
             postalCode = parser.parsedPostalCode,
-            country = parseEnum(FieldKey.COUNTRY),
+            country = parser.parseEnum(FieldKey.COUNTRY),
             licenseNumber = parser.parseString(FieldKey.DRIVER_LICENSE_NUMBER),
             documentId = parser.parseString(FieldKey.UNIQUE_DOCUMENT_ID),
             auditInformation = parser.parseString(FieldKey.AUDIT_INFORMATION),
             inventoryControlNumber = parser.parseString(FieldKey.INVENTORY_CONTROL_NUMBER),
-            complianceType = parseEnum(FieldKey.COMPLIANCE_TYPE),
+            complianceType = parser.parseEnum(FieldKey.COMPLIANCE_TYPE),
             isOrganDonor = parser.parseBoolean(FieldKey.IS_ORGAN_DONOR),
             isVeteran = parser.parseBoolean(FieldKey.IS_VETERAN),
             isTemporaryDocument = parser.parseBoolean(FieldKey.IS_TEMPORARY_DOCUMENT),
@@ -168,7 +170,7 @@ open class DLParser(val data: String) {
             jurisdictionVehicleDescription = parser.parseString(FieldKey.JURISDICTION_VEHICLE_CLASS_DESCRIPTION),
             jurisdictionRestrictionDescription = parser.parseString(FieldKey.JURISDICTION_RESTRICTION_CODE_DESCRIPTION),
             jurisdictionEndorsementDescription = parser.parseString(FieldKey.JURISDICTION_ENDORSEMENT_CODE_DESCRIPTION),
-            version = version,
+            version = parser.versionNumber,
             pdf417Data = data
         )
     }
@@ -213,13 +215,14 @@ open class DLParser(val data: String) {
                 return listOf(it)
             }
 
-            parseString(FieldKey.GIVEN_NAME)?.let {
-                val parts = it.split(",")
+            parseString(FieldKey.GIVEN_NAME)?.let { givenName ->
+                val parts = givenName.split(",")
+                if (parts.size < 3) return listOf()
                 return parts.drop(0).map { it.trim() }
             }
 
-            parseString(FieldKey.DRIVER_LICENSE_NAME)?.let {
-                val parts = it.split(",")
+            parseString(FieldKey.DRIVER_LICENSE_NAME)?.let { driverLicenseName ->
+                val parts = driverLicenseName.split(",")
                 return parts.drop(0).dropLast(0).map { it.trim() }
             }
             return listOf()
@@ -249,16 +252,17 @@ open class DLParser(val data: String) {
      */
     protected open val parsedWeight: Weight
         get() {
-            parseString(FieldKey.WEIGHT_POUNDS)?.toDoubleOrNull()?.let {
-                return Weight(pounds = it)
-            }
+            val weight = Weight()
             parseString(FieldKey.WEIGHT_KILOGRAMS)?.toDoubleOrNull()?.let {
-                return Weight(pounds = Utils.poundsFromKilograms(it))
+                weight.pounds = Utils.poundsFromKilograms(it)
+            }
+            parseString(FieldKey.WEIGHT_POUNDS)?.toDoubleOrNull()?.let {
+                weight.pounds = it
             }
             parseString(FieldKey.WEIGHT_RANGE)?.toIntOrNull()?.let {
-                return Weight(WeightRange(it))
+                weight.range = WeightRange(it)
             }
-            return Weight()
+            return weight
         }
 
     /**
@@ -269,7 +273,7 @@ open class DLParser(val data: String) {
             val rawCode = parseString(FieldKey.POSTAL_CODE)
             val firstPart: String? = rawCode?.substring(0, 5) ?: return null
             val secondPart: String? = rawCode.substring(5)
-            if (secondPart == null || secondPart == "0000") return firstPart
+            if (secondPart.isNullOrBlank() || secondPart.all { it == '0' }) return firstPart
             return firstPart.plus("-").plus(secondPart)
         }
 }

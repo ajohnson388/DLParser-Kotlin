@@ -41,6 +41,9 @@ internal class VersionOneParser(data: String) : DLParser(data) {
         fields.remove(FieldKey.IS_TEMPORARY_DOCUMENT)
         fields[FieldKey.IS_ORGAN_DONOR] = "DBH"
         fields.remove(FieldKey.IS_VETERAN)
+        fields.remove(FieldKey.UNDER_EIGHTEEN_UNTIL_DATE)
+        fields.remove(FieldKey.UNDER_NINETEEN_UNTIL_DATE)
+        fields.remove(FieldKey.UNDER_TWENTY_ONE_UNTIL_DATE)
     }
 
     override val unitedStatesDateFormat = "yyyyMMdd"

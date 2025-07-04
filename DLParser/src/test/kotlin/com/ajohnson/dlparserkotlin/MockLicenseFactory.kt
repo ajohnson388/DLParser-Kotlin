@@ -165,6 +165,9 @@ class MockLicenseFactory {
             license.isOrganDonor = null
             license.isVeteran = null
             license.federalVehicleCode = null
+            license.underEighteenUntilDate = null
+            license.underNineteenUntilDate = null
+            license.underTwentyOneUntilDate = null
             return license
         }
 

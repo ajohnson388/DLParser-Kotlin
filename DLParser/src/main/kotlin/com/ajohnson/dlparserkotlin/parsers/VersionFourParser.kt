@@ -13,5 +13,8 @@ internal class VersionFourParser(data: String) : DLParser(data) {
         fields.remove(FieldKey.FEDERAL_VEHICLE_CODE)
         fields.remove(FieldKey.DRIVER_LICENSE_NAME)
         fields.remove(FieldKey.GIVEN_NAME)
+        fields.remove(FieldKey.UNDER_EIGHTEEN_UNTIL_DATE)
+        fields.remove(FieldKey.UNDER_NINETEEN_UNTIL_DATE)
+        fields.remove(FieldKey.UNDER_TWENTY_ONE_UNTIL_DATE)
     }
 }
