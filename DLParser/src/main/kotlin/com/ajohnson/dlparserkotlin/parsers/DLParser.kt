@@ -78,18 +78,12 @@ open class DLParser(val data: String) {
      * The version number detected in the driver license data or nil
      * if the data is not AAMVA compliant.
      */
-//    val versionNumber get() = Utils.firstRegexMatch("\\d{6}(\\d{2})\\w+", data)?.toInt()
-    val versionNumber: Int?
-        get() {
-            val matches = Regex("""\\d{6}(\\d{2})\\w+""").find(data)
-            val value = matches?.value
-            return value?.substring(7)?.toIntOrNull()
-        }
+    val versionNumber: Int? get() = Utils.firstRegexMatch("\\d{6}(\\d{2})\\w+", data)?.toInt()
 
     /**
     The number of subfiles found in the driver license data.
      */
-    val subfileCount get() = Regex("""\\d{8}(\\d{2})\\w+""").find(data)?.value?.toInt()
+    val subfileCount get() = Utils.firstRegexMatch("\\d{8}(\\d{2})\\w+", data)?.toInt()
 
     protected open val unitedStatesDateFormat get() = "MMddyyyy"
     protected open val canadaDateFormat get() = "yyyyMMdd"
@@ -182,26 +176,17 @@ open class DLParser(val data: String) {
 
     // Generic parsers
 
-    private fun firstMatch(pattern: String, data: String): String? {
-        val regex = Regex(pattern, setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE))
-        val matchResult = regex.find(data) ?: return null
-        val matchedGroup = matchResult.groups[1]?.value ?: return null
-        val matchedString = matchedGroup.trim()
-        return matchedString.ifEmpty { null }
-    }
-
     internal open fun parseString(key: FieldKey): String? {
         val rawKey = fields[key] ?: return null
-        return firstMatch("""\n$rawKey(.*?)\n""", data)
-            ?: firstMatch("""DL$rawKey(.*?)\n""", data)
-            ?: firstMatch("""ID$rawKey(.*?)\n""", data)
-//        val regex = Regex("$rawKey(.+)\\b", RegexOption.IGNORE_CASE)
-//        return regex.find(data)?.value?.removePrefix(rawKey)
+        return Utils.firstRegexMatch("\\n$rawKey(.*?)\\n", data)
+            ?: Utils.firstRegexMatch("DL$rawKey(.*?)\\n", data)
+            ?: Utils.firstRegexMatch("ID$rawKey(.*?)\\n", data)
     }
 
     internal open fun parseDate(key: FieldKey): Date? {
         val dateString = parseString(key)
-        if (dateString.isNullOrEmpty()) return null
+        // In some cases like HAZMAT, an empty field is all zeroes
+        if (dateString.isNullOrEmpty() || dateString.all { it == '0' }) return null
         return SimpleDateFormat(dateFormat, Locale.US).parse(dateString)
     }
 
