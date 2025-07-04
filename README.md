@@ -11,16 +11,17 @@ supports all AAMVA versions and AAMVA defined fields.
 
 ## Features
 
-- [x] Support for all AAMVA standards (v1-9)
+- [x] Support for all AAMVA standards (v1-11)
 - [x] Support for all AAMVA fields
 - [x] License model for all AAMVA fields
 - [x] Offline use
+- [x] Unit tests for version parsers
 
 ## Requirements
 
-- API level 16 or higher
-- Kotlin 1.2
-- Android Studio 3
+- API level 34 or higher
+- Kotlin 2.2
+- Android Studio 2025.1.1
 
 ## Installation
 
@@ -28,7 +29,7 @@ supports all AAMVA versions and AAMVA defined fields.
 
 Add the dependency to the app-level build.gradle file
 
-`implementation 'com.github.ajohnson388:DLParser-Kotlin:1.0.0'`
+`implementation 'com.github.ajohnson388:DLParser-Kotlin:2.0.0'`
 
 ## Sample Installation
 
@@ -39,6 +40,8 @@ Sync Gradle.
 Launch a debug build on a physical device or an emulator using a webcam.
 
 Scan driver license barcodes by using the example app and view output through the console.
+
+NOTE: The example app uses the `GmsBarcodeScanner`. This scanner requires the barcode to be scanned in landscape orientation and must be presented closely to the camera for capture to work. It can take a few seconds and the barcode must be clearly presented.
 
 ## Contribute
 
